@@ -1,4 +1,4 @@
-package binanceGoSdk
+package binance
 
 import (
 	"github.com/stretchr/testify/assert"

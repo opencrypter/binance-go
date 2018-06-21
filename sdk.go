@@ -1,4 +1,4 @@
-package binanceGoSdk
+package binance
 
 import (
 	"errors"
