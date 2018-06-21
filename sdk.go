@@ -1,12 +1,9 @@
 package binanceGoSdk
 
 import (
+	"errors"
 	"io/ioutil"
 	"net/http"
-)
-
-const (
-	apiBaseUrl = "https://api.binance.com"
 )
 
 type Sdk struct {
@@ -18,20 +15,20 @@ type Client interface {
 }
 
 type client struct {
-	http      *http.Client
+	baseUrl   string
 	apiKey    string
 	apiSecret string
 }
 
-func (_m *client) Get(path string) ([]byte, error) {
-	response, err := http.Get(apiBaseUrl + path)
+func (m *client) Get(path string) ([]byte, error) {
+	response, err := http.Get(m.baseUrl + path)
 	if err != nil {
 		return nil, err
 	}
 
-	responseBody, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return nil, err
+	responseBody, _ := ioutil.ReadAll(response.Body)
+	if response.StatusCode >= 300 {
+		return nil, errors.New("Error " + string(response.StatusCode) + ": " + string(responseBody))
 	}
 
 	return responseBody, nil
@@ -40,7 +37,7 @@ func (_m *client) Get(path string) ([]byte, error) {
 func New(apiKey string, apiSecret string) Sdk {
 	return Sdk{
 		client: &client{
-			http:      http.DefaultClient,
+			baseUrl:   "https://api.binance.com",
 			apiKey:    apiKey,
 			apiSecret: apiSecret,
 		},
