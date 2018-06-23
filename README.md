@@ -53,19 +53,19 @@ depth, err := sdk.Depth(query)
 
 ```
 
-### Recent trades list
-Get recent trades for a specific symbol
+### Historical trades list
+Get historical trades for a specific symbol
 
 Official doc: [Recent trades list](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#recent-trades-list)
 
 #### Example
 ```go
-// Example with limit by default
+// Example to retrieve last trades with the limit by default
 query := binance.NewTradesQuery("ETHBTC")
 response, err := sdk.Trades(query)
 
-// Example with limit parameter
-query := binance.NewTradesQuery("ETHBTC").Limit(350)
+// Example to retrieve historical trades from the given id and a result limit
+query := binance.NewTradesQuery("ETHBTC").Limit(350).FromId(3500)
 trades, err := sdk.Trades(query)
 
 ```
