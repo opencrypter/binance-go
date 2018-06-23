@@ -36,6 +36,22 @@ Official doc: [exchange-information](https://github.com/binance-exchange/binance
 exchangeInfo, err := sdk.ExchangeInfo()
 ```
 
+### Order book
+Order depth for a specific symbol
+
+Official doc: [Order book](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#order-book)
+
+#### Example
+```go
+// Example with limit by default
+query := binance.NewDepthQuery("ETHBTC")
+depth, err := sdk.Depth(query)
+
+// Example with limit parameter
+query := binance.NewDepthQuery("ETHBTC").Limit(5)
+depth, err := sdk.Depth(query)
+
+```
 
 ## Available web socket streams:
 Not available yet.
