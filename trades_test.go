@@ -24,6 +24,22 @@ func TestSdk_Trades(t *testing.T) {
 		assert.Equal(t, validTradesResponse(), response)
 	})
 
+	t.Run("It should read optional parameters", func(t *testing.T) {
+		clientMock := &mocks.Client{}
+		sdk := Sdk{client: clientMock}
+
+		expected := validTradesJson()
+
+		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
+			return path == "/api/v1/trades?symbol=ETHBTC&limit=350"
+		})).Return(expected, nil)
+
+		query := NewTradesQuery("ETHBTC").Limit(350)
+		response, _ := sdk.Trades(query)
+
+		assert.Equal(t, validTradesResponse(), response)
+	})
+
 	t.Run("It should return error when api fails", func(t *testing.T) {
 		clientMock := &mocks.Client{}
 		sdk := Sdk{client: clientMock}
