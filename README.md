@@ -56,19 +56,37 @@ depth, err := sdk.Depth(query)
 ### Historical trades list
 Get historical trades for a specific symbol
 
-Official doc: [Recent trades list](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#recent-trades-list)
+Official doc: [Recent trades list](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#old-trade-lookup-market_data)
 
 #### Example
 ```go
 // Example to retrieve last trades with the limit by default
 query := binance.NewTradesQuery("ETHBTC")
-response, err := sdk.Trades(query)
+response, err := sdk.CompressedTrades(query)
 
 // Example to retrieve historical trades from the given id and a result limit
 query := binance.NewTradesQuery("ETHBTC").Limit(350).FromId(3500)
+trades, err := sdk.CompressedTrades(query)
+
+```
+
+### Compressed/Aggregate trades list
+Get compressed, aggregate trades. Trades that fill at the time, from the same order, with the same price will have the quantity aggregated.
+
+Official doc: [Compressed/Aggregate trades list](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#compressedaggregate-trades-list)
+
+#### Example
+```go
+// Example with parameters by default
+query := binance.NewCompressedTradesQuery("ETHBTC")
+response, err := sdk.Trades(query)
+
+// Example with all parameters
+query := binance.NewCompressedTradesQuery("ETHBTC").Limit(10).FromId(1).StartTime(1498793709153).EndTime(1498793709163)
 trades, err := sdk.Trades(query)
 
 ```
+
 
 ## Available web socket streams:
 Not available yet.
