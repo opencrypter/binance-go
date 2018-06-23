@@ -21,7 +21,7 @@ func TestSdk_Depth(t *testing.T) {
 
 		response, _ := sdk.Depth(NewDepthQuery("ETHBTC"))
 
-		assert.Equal(t, validResponse(), response)
+		assert.Equal(t, validDepthResponse(), response)
 	})
 
 	t.Run("It should read optional parameters", func(t *testing.T) {
@@ -37,7 +37,7 @@ func TestSdk_Depth(t *testing.T) {
 		query := NewDepthQuery("ETHBTC").Limit(500)
 		response, _ := sdk.Depth(query)
 
-		assert.Equal(t, validResponse(), response)
+		assert.Equal(t, validDepthResponse(), response)
 	})
 
 	t.Run("It should return error when api fails", func(t *testing.T) {
@@ -92,7 +92,7 @@ func validDepthJson() []byte {
 	}`)
 }
 
-func validResponse() *Depth {
+func validDepthResponse() *Depth {
 	return &Depth{
 		LastUpdateId: 1027024,
 		Bids: []DepthOrder{
