@@ -81,7 +81,7 @@ Official doc: [Compressed/Aggregate trades list](https://github.com/binance-exch
 query := binance.NewCompressedTradesQuery("ETHBTC")
 response, err := sdk.Trades(query)
 
-// Example with all parameters
+// Example with all parameters. Keep in mind that you cannot use all parameters at the same time (read the official doc)
 query := binance.NewCompressedTradesQuery("ETHBTC").Limit(10).FromId(1).StartTime(1498793709153).EndTime(1498793709163)
 trades, err := sdk.Trades(query)
 
