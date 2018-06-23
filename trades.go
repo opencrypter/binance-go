@@ -17,6 +17,7 @@ type Trade struct {
 type tradesQuery struct {
 	symbol string
 	limit  int
+	fromId int
 }
 
 // Returns the required query for the Trades endpoint.
@@ -30,19 +31,27 @@ func NewTradesQuery(symbol string) *tradesQuery {
 // Sets the optional limit parameter that by default is 500.
 func (t *tradesQuery) Limit(limit int) *tradesQuery {
 	t.limit = limit
+	return t
+}
 
+// TradeId to fetch from. Default gets most recent trades.
+func (t *tradesQuery) FromId(fromId int) *tradesQuery {
+	t.fromId = fromId
 	return t
 }
 
 func parseTradesResponse(jsonContent []byte) ([]Trade, error) {
 	response := make([]Trade, 0)
 	err := json.Unmarshal(jsonContent, &response)
-
 	return response, err
 }
 
 func (sdk *Sdk) Trades(query *tradesQuery) ([]Trade, error) {
-	url := "/api/v1/trades" + "?symbol=" + query.symbol + "&limit=" + strconv.Itoa(query.limit)
+	url := "/api/v1/historicalTrades" + "?symbol=" + query.symbol + "&limit=" + strconv.Itoa(query.limit)
+
+	if query.fromId > 0 {
+		url += "&fromId=" + strconv.Itoa(query.fromId)
+	}
 
 	responseContent, err := sdk.client.Get(url)
 	if err != nil {

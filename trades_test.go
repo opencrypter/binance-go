@@ -16,7 +16,7 @@ func TestSdk_Trades(t *testing.T) {
 		expected := validTradesJson()
 
 		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v1/trades?symbol=ETHBTC&limit=500"
+			return path == "/api/v1/historicalTrades?symbol=ETHBTC&limit=500"
 		})).Return(expected, nil)
 
 		response, _ := sdk.Trades(NewTradesQuery("ETHBTC"))
@@ -31,10 +31,10 @@ func TestSdk_Trades(t *testing.T) {
 		expected := validTradesJson()
 
 		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v1/trades?symbol=ETHBTC&limit=350"
+			return path == "/api/v1/historicalTrades?symbol=ETHBTC&limit=350&fromId=2300"
 		})).Return(expected, nil)
 
-		query := NewTradesQuery("ETHBTC").Limit(350)
+		query := NewTradesQuery("ETHBTC").Limit(350).FromId(2300)
 		response, _ := sdk.Trades(query)
 
 		assert.Equal(t, validTradesResponse(), response)
@@ -47,7 +47,7 @@ func TestSdk_Trades(t *testing.T) {
 		expectedError := errors.New("error")
 
 		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v1/trades?symbol=ETHBTC&limit=500"
+			return path == "/api/v1/historicalTrades?symbol=ETHBTC&limit=500"
 		})).Return(nil, expectedError)
 
 		_, err := sdk.Trades(NewTradesQuery("ETHBTC"))
@@ -60,7 +60,7 @@ func TestSdk_Trades(t *testing.T) {
 		sdk := Sdk{client: clientMock}
 
 		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v1/trades?symbol=ETHBTC&limit=500"
+			return path == "/api/v1/historicalTrades?symbol=ETHBTC&limit=500"
 		})).Return(invalidTradesJson(), nil)
 
 		_, err := sdk.Trades(NewTradesQuery("ETHBTC"))
