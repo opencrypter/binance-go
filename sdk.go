@@ -20,8 +20,13 @@ type client struct {
 	apiSecret string
 }
 
-func (m *client) Get(path string) ([]byte, error) {
-	response, err := http.Get(m.baseUrl + path)
+func (c *client) Get(path string) ([]byte, error) {
+	request, _ := http.NewRequest("GET", c.baseUrl+path, nil)
+	request.Header.Set("X-MBX-APIKEY", c.apiKey)
+
+	client := http.Client{}
+	response, err := client.Do(request)
+
 	if err != nil {
 		return nil, err
 	}
