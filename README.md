@@ -62,11 +62,11 @@ Official doc: [Recent trades list](https://github.com/binance-exchange/binance-o
 ```go
 // Example to retrieve last trades with the limit by default
 query := binance.NewTradesQuery("ETHBTC")
-response, err := sdk.CompressedTrades(query)
+response, err := sdk.Trades(query)
 
 // Example to retrieve historical trades from the given id and a result limit
 query := binance.NewTradesQuery("ETHBTC").Limit(350).FromId(3500)
-trades, err := sdk.CompressedTrades(query)
+trades, err := sdk.Trades(query)
 
 ```
 
@@ -79,11 +79,28 @@ Official doc: [Compressed/Aggregate trades list](https://github.com/binance-exch
 ```go
 // Example with parameters by default
 query := binance.NewCompressedTradesQuery("ETHBTC")
-response, err := sdk.Trades(query)
+response, err := sdk.CompressedTrades(query)
 
 // Example with all parameters. Keep in mind that you cannot use all parameters at the same time (read the official doc)
 query := binance.NewCompressedTradesQuery("ETHBTC").Limit(10).FromId(1).StartTime(1498793709153).EndTime(1498793709163)
-trades, err := sdk.Trades(query)
+trades, err := sdk.CompressedTrades(query)
+
+```
+
+### Kline/Candlestick data
+Kline/candlestick bars for a symbol. Klines are uniquely identified by their open time.
+
+Official doc: [Kline/Candlestick data](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#klinecandlestick-data)
+
+#### Example
+```go
+// Example with parameters by default
+query := binance.NewKLinesQuery("ETHBTC", binance.Interval12h)
+response, err := sdk.KLines(query)
+
+// Example with all parameters.
+query := NewKLinesQuery("ETHBTC", Interval1m).Limit(10).StartTime(1498793709153).EndTime(1498793709163)
+trades, err := sdk.KLines(query)
 
 ```
 
