@@ -50,3 +50,7 @@ func TestNew(t *testing.T) {
 	sdk := New("api-key", "api-secret")
 	assert.Implements(t, (*Client)(nil), sdk.client)
 }
+
+func invalidJson() []byte {
+	return []byte(`<h1>Page Not available</h1>`)
+}
