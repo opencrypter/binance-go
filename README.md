@@ -50,7 +50,6 @@ depth, err := sdk.Depth(query)
 // Example with limit parameter
 query := binance.NewDepthQuery("ETHBTC").Limit(5)
 depth, err := sdk.Depth(query)
-
 ```
 
 ### Historical trades list
@@ -67,7 +66,6 @@ response, err := sdk.Trades(query)
 // Example to retrieve historical trades from the given id and a result limit
 query := binance.NewTradesQuery("ETHBTC").Limit(350).FromId(3500)
 trades, err := sdk.Trades(query)
-
 ```
 
 ### Compressed/Aggregate trades list
@@ -84,7 +82,6 @@ response, err := sdk.CompressedTrades(query)
 // Example with all parameters. Keep in mind that you cannot use all parameters at the same time (read the official doc)
 query := binance.NewCompressedTradesQuery("ETHBTC").Limit(10).FromId(1).StartTime(1498793709153).EndTime(1498793709163)
 trades, err := sdk.CompressedTrades(query)
-
 ```
 
 ### Kline/Candlestick data
@@ -101,9 +98,28 @@ response, err := sdk.KLines(query)
 // Example with all parameters.
 query := NewKLinesQuery("ETHBTC", Interval1m).Limit(10).StartTime(1498793709153).EndTime(1498793709163)
 trades, err := sdk.KLines(query)
-
 ```
 
+### Symbol price ticker
+Latest price for a symbol.
+
+Official doc: [Symbol price ticker](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#symbol-price-ticker)
+
+#### Example
+```go
+query := binance.NewSymbolPriceTickerQuery("ETHBTC")
+response, err := sdk.SymbolPriceTicker(query)
+```
+
+### All symbol price tickers
+Latest price for all symbols.
+
+Official doc: [Symbol price ticker](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#symbol-price-ticker)
+
+#### Example
+```go
+response, err := sdk.AllSymbolPriceTickers()
+```
 
 ## Available web socket streams:
 Not available yet.
