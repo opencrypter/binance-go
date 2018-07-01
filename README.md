@@ -121,6 +121,27 @@ Official doc: [Symbol price ticker](https://github.com/binance-exchange/binance-
 response, err := sdk.AllSymbolPriceTickers()
 ```
 
+### Symbol order book ticker
+Best price/qty on the order book for a symbol.
+
+Official doc: [Symbol order book ticker](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#symbol-order-book-ticker)
+
+#### Example
+```go
+query := binance.NewSymbolOrderBookTickerQuery("ETHBTC")
+response, err := sdk.SymbolOrderBookTicker(query)
+```
+
+### All symbol order book tickers
+Best price/qty on the order book for all symbols.
+
+Official doc: [Symbol order book ticker](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#symbol-order-book-ticker)
+
+#### Example
+```go
+response, err := sdk.AllSymbolOrderBookTickers()
+```
+
 ## Available web socket streams:
 Not available yet.
 
