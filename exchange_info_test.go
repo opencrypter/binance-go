@@ -2,7 +2,7 @@ package binance
 
 import (
 	"errors"
-	"github.com/isd4n/binance-go-sdk/mocks"
+	"github.com/isd4n/binance-go/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"testing"
@@ -19,10 +19,8 @@ func TestSdk_ExchangeInfo(t *testing.T) {
 			return path == "/api/v1/exchangeInfo"
 		})).Return(expected, nil)
 
-		expectedResponse, _ := parseExchangeInfo(expected)
 		response, _ := sdk.ExchangeInfo()
-
-		assert.Equal(t, expectedResponse, response)
+		assert.Equal(t, validExchangeInfoResponse(), response)
 	})
 
 	t.Run("It should return error when api fails", func(t *testing.T) {
@@ -46,7 +44,7 @@ func TestSdk_ExchangeInfo(t *testing.T) {
 
 		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
 			return path == "/api/v1/exchangeInfo"
-		})).Return(invalidExchangeInfoJson(), nil)
+		})).Return(invalidJson(), nil)
 
 		_, err := sdk.ExchangeInfo()
 
@@ -54,9 +52,6 @@ func TestSdk_ExchangeInfo(t *testing.T) {
 	})
 }
 
-func invalidExchangeInfoJson() []byte {
-	return []byte(`<h1>Page Not available</h1>`)
-}
 func validExchangeInfoJson() []byte {
 	return []byte(`{
 		"timezone": "UTC",
@@ -102,4 +97,62 @@ func validExchangeInfoJson() []byte {
     		}]
   		}]
 	}`)
+}
+
+func validExchangeInfoResponse() *ExchangeInfo {
+	return &ExchangeInfo{
+		Timezone:   "UTC",
+		ServerTime: 1508631584636,
+		RateLimits: []RateLimits{
+			{
+				RateLimitType: "REQUESTS",
+				Interval:      "MINUTE",
+				Limit:         1200,
+			},
+			{
+				RateLimitType: "ORDERS",
+				Interval:      "SECOND",
+				Limit:         10,
+			},
+			{
+				RateLimitType: "ORDERS",
+				Interval:      "DAY",
+				Limit:         100000,
+			},
+		},
+		ExchangeFilters: []string{},
+		Symbols: []Symbol{
+			{
+				Symbol:             "ETHBTC",
+				Status:             "TRADING",
+				BaseAsset:          "ETH",
+				BaseAssetPrecision: 8,
+				QuoteAsset:         "BTC",
+				QuotePrecision:     8,
+				OrderTypes: []string{
+					"LIMIT",
+					"MARKET",
+				},
+				IcebergAllowed: false,
+				Filters: []Filter{
+					{
+						FilterType: "PRICE_FILTER",
+						MinPrice:   0.000001,
+						MaxPrice:   100000,
+						TickSize:   0.000001,
+					},
+					{
+						FilterType:  "LOT_SIZE",
+						MinQuantity: 0.001,
+						MaxQuantity: 100000,
+						StepSize:    0.001,
+					},
+					{
+						FilterType:  "MIN_NOTIONAL",
+						MinNotional: 0.001,
+					},
+				},
+			},
+		},
+	}
 }

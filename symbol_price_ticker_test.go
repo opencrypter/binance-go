@@ -2,7 +2,7 @@ package binance
 
 import (
 	"errors"
-	"github.com/isd4n/binance-go-sdk/mocks"
+	"github.com/isd4n/binance-go/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"testing"

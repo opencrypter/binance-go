@@ -2,7 +2,7 @@ package binance
 
 import (
 	"errors"
-	"github.com/isd4n/binance-go-sdk/mocks"
+	"github.com/isd4n/binance-go/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"testing"
@@ -62,7 +62,7 @@ func TestSdk_KLines(t *testing.T) {
 
 		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
 			return path == "/api/v1/klines?symbol=ETHBTC&interval=1m"
-		})).Return(invalidKLinesJson(), nil)
+		})).Return(invalidJson(), nil)
 
 		_, err := sdk.KLines(NewKLinesQuery("ETHBTC", Interval1m))
 
@@ -70,9 +70,6 @@ func TestSdk_KLines(t *testing.T) {
 	})
 }
 
-func invalidKLinesJson() []byte {
-	return []byte(`<h1>Page Not available</h1>`)
-}
 func validKLinesJson() []byte {
 	return []byte(`[
 		[	

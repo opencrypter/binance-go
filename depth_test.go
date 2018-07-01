@@ -2,7 +2,7 @@ package binance
 
 import (
 	"errors"
-	"github.com/isd4n/binance-go-sdk/mocks"
+	"github.com/isd4n/binance-go/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"testing"
@@ -61,7 +61,7 @@ func TestSdk_Depth(t *testing.T) {
 
 		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
 			return path == "/api/v1/depth?symbol=ETHBTC&limit=100"
-		})).Return(invalidDepthJson(), nil)
+		})).Return(invalidJson(), nil)
 
 		_, err := sdk.Depth(NewDepthQuery("ETHBTC"))
 
@@ -69,9 +69,6 @@ func TestSdk_Depth(t *testing.T) {
 	})
 }
 
-func invalidDepthJson() []byte {
-	return []byte(`<h1>Page Not available</h1>`)
-}
 func validDepthJson() []byte {
 	return []byte(`{
   		"lastUpdateId": 1027024,

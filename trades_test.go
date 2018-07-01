@@ -2,7 +2,7 @@ package binance
 
 import (
 	"errors"
-	"github.com/isd4n/binance-go-sdk/mocks"
+	"github.com/isd4n/binance-go/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"testing"
@@ -61,7 +61,7 @@ func TestSdk_Trades(t *testing.T) {
 
 		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
 			return path == "/api/v1/historicalTrades?symbol=ETHBTC&limit=500"
-		})).Return(invalidTradesJson(), nil)
+		})).Return(invalidJson(), nil)
 
 		_, err := sdk.Trades(NewTradesQuery("ETHBTC"))
 
@@ -69,9 +69,6 @@ func TestSdk_Trades(t *testing.T) {
 	})
 }
 
-func invalidTradesJson() []byte {
-	return []byte(`<h1>Page Not available</h1>`)
-}
 func validTradesJson() []byte {
 	return []byte(`[
   		{

@@ -36,8 +36,8 @@ type Filter struct {
 	MinPrice    float64 `json:",omitempty,string"`
 	MaxPrice    float64 `json:",omitempty,string"`
 	TickSize    float64 `json:",omitempty,string"`
-	MinQuantity float64 `json:",omitempty,string"`
-	MaxQuantity float64 `json:",omitempty,string"`
+	MinQuantity float64 `json:"minQty,omitempty,string"`
+	MaxQuantity float64 `json:"maxQty,omitempty,string"`
 	StepSize    float64 `json:",omitempty,string"`
 	MinNotional float64 `json:",omitempty,string"`
 }
