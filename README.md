@@ -1,4 +1,4 @@
-# Binance-Go-SDK
+# Binance-Go
 [![Build Status](https://travis-ci.org/isd4n/binance-go-sdk.svg?branch=master)](https://travis-ci.org/isd4n/binance-go-sdk)
 [![codecov](https://codecov.io/gh/isd4n/binance-go-sdk/branch/master/graph/badge.svg)](https://codecov.io/gh/isd4n/binance-go-sdk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -9,7 +9,7 @@ are not implemented yet. Feel free to collaborate with me if you need them now :
 ## Installation
 After you've configured your local Go package:
 ```bash
-go get github.com/isd4n/binance-go-sdk
+go get github.com/isd4n/binance-go
 ```
 
 ## Usage
