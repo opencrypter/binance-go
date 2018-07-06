@@ -67,9 +67,11 @@ func (d *depthQuery) Limit(limit int) *depthQuery {
 //
 // Caution: setting limit=0 can return a lot of data.
 func (sdk Sdk) Depth(query *depthQuery) (*Depth, error) {
-	url := "/api/v1/depth" + "?symbol=" + query.symbol + "&limit=" + strconv.Itoa(query.limit)
+	request := newRequest("GET", "/api/v1/depth").
+		Param("symbol", query.symbol).
+		Param("limit", strconv.Itoa(query.limit))
 
-	responseContent, err := sdk.client.Get(url)
+	responseContent, err := sdk.client.Do(request)
 	if err != nil {
 		return nil, err
 	}

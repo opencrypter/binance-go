@@ -60,25 +60,25 @@ func parseCompressedTradesResponse(jsonContent []byte) ([]CompressedTrade, error
 }
 
 func (sdk *Sdk) CompressedTrades(query *compressedTradesQuery) ([]CompressedTrade, error) {
-	url := "/api/v1/aggTrades" + "?symbol=" + query.symbol
+	request := newRequest("GET", "/api/v1/aggTrades").Param("symbol", query.symbol)
 
 	if query.limit > 0 {
-		url += "&limit=" + strconv.Itoa(query.limit)
+		request.Param("limit", strconv.Itoa(query.limit))
 	}
 
 	if query.fromId > 0 {
-		url += "&fromId=" + strconv.Itoa(query.fromId)
+		request.Param("fromId", strconv.Itoa(query.fromId))
 	}
 
 	if query.startTime > 0 {
-		url += "&startTime=" + strconv.Itoa(query.startTime)
+		request.Param("startTime", strconv.Itoa(query.startTime))
 	}
 
 	if query.endTime > 0 {
-		url += "&endTime=" + strconv.Itoa(query.endTime)
+		request.Param("endTime", strconv.Itoa(query.endTime))
 	}
 
-	responseContent, err := sdk.client.Get(url)
+	responseContent, err := sdk.client.Do(request)
 	if err != nil {
 		return nil, err
 	}

@@ -2,22 +2,24 @@ package binance
 
 import (
 	"errors"
-	"github.com/isd4n/binance-go/mocks"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"testing"
 )
 
 func TestSdk_CompressedTrades(t *testing.T) {
+	method, url := "GET", "/api/v1/aggTrades"
+
 	t.Run("It should convert api response to a compressed Trade slice", func(t *testing.T) {
-		clientMock := &mocks.Client{}
-		sdk := Sdk{client: clientMock}
+		mockedClient := NewMockClient(gomock.NewController(t))
+		sdk := Sdk{client: mockedClient}
+		expectedRequest := newRequest(method, url).Param("symbol", "ETHBTC")
 
-		expected := validCompressedTradesJson()
-
-		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v1/aggTrades?symbol=ETHBTC"
-		})).Return(expected, nil)
+		mockedClient.
+			EXPECT().
+			Do(expectedRequest).
+			MinTimes(1).
+			Return(validCompressedTradesJson(), nil)
 
 		response, _ := sdk.CompressedTrades(NewCompressedTradesQuery("ETHBTC"))
 
@@ -25,15 +27,20 @@ func TestSdk_CompressedTrades(t *testing.T) {
 	})
 
 	t.Run("It should read optional parameters", func(t *testing.T) {
-		clientMock := &mocks.Client{}
-		sdk := Sdk{client: clientMock}
+		mockedClient := NewMockClient(gomock.NewController(t))
+		sdk := Sdk{client: mockedClient}
+		expectedRequest := newRequest(method, url).
+			Param("symbol", "ETHBTC").
+			Param("limit", "10").
+			Param("fromId", "1").
+			Param("startTime", "1498793709153").
+			Param("endTime", "1498793709163")
 
-		expected := validCompressedTradesJson()
-
-		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v1/aggTrades"+
-				"?symbol=ETHBTC&limit=10&fromId=1&startTime=1498793709153&endTime=1498793709163"
-		})).Return(expected, nil)
+		mockedClient.
+			EXPECT().
+			Do(expectedRequest).
+			MinTimes(1).
+			Return(validCompressedTradesJson(), nil)
 
 		query := NewCompressedTradesQuery("ETHBTC").Limit(10).FromId(1).StartTime(1498793709153).EndTime(1498793709163)
 		response, _ := sdk.CompressedTrades(query)
@@ -42,27 +49,31 @@ func TestSdk_CompressedTrades(t *testing.T) {
 	})
 
 	t.Run("It should return error when api fails", func(t *testing.T) {
-		clientMock := &mocks.Client{}
-		sdk := Sdk{client: clientMock}
+		mockedClient := NewMockClient(gomock.NewController(t))
+		sdk := Sdk{client: mockedClient}
+		expectedRequest := newRequest(method, url).Param("symbol", "ETHBTC")
 
-		expectedError := errors.New("error")
-
-		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v1/aggTrades?symbol=ETHBTC"
-		})).Return(nil, expectedError)
+		mockedClient.
+			EXPECT().
+			Do(expectedRequest).
+			MinTimes(1).
+			Return(nil, errors.New("error"))
 
 		_, err := sdk.CompressedTrades(NewCompressedTradesQuery("ETHBTC"))
 
-		assert.Equal(t, expectedError, err)
+		assert.Error(t, err)
 	})
 
 	t.Run("It should return error when response cannot be mapped", func(t *testing.T) {
-		clientMock := &mocks.Client{}
-		sdk := Sdk{client: clientMock}
+		mockedClient := NewMockClient(gomock.NewController(t))
+		sdk := Sdk{client: mockedClient}
+		expectedRequest := newRequest(method, url).Param("symbol", "ETHBTC")
 
-		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v1/aggTrades?symbol=ETHBTC"
-		})).Return(invalidJson(), nil)
+		mockedClient.
+			EXPECT().
+			Do(expectedRequest).
+			MinTimes(1).
+			Return(invalidJson(), nil)
 
 		_, err := sdk.CompressedTrades(NewCompressedTradesQuery("ETHBTC"))
 

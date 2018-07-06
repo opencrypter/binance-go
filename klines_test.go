@@ -2,22 +2,27 @@ package binance
 
 import (
 	"errors"
-	"github.com/isd4n/binance-go/mocks"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"testing"
 )
 
 func TestSdk_KLines(t *testing.T) {
+	method, url := "GET", "/api/v1/klines"
+
 	t.Run("It should convert api response to a compressed KLine slice", func(t *testing.T) {
-		clientMock := &mocks.Client{}
-		sdk := Sdk{client: clientMock}
+		mockedClient := NewMockClient(gomock.NewController(t))
+		sdk := Sdk{client: mockedClient}
 
-		expected := validKLinesJson()
+		expectedRequest := newRequest(method, url).
+			Param("symbol", "ETHBTC").
+			Param("interval", string(Interval1m))
 
-		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v1/klines?symbol=ETHBTC&interval=1m"
-		})).Return(expected, nil)
+		mockedClient.
+			EXPECT().
+			Do(expectedRequest).
+			MinTimes(1).
+			Return(validKLinesJson(), nil)
 
 		response, _ := sdk.KLines(NewKLinesQuery("ETHBTC", Interval1m))
 
@@ -25,15 +30,21 @@ func TestSdk_KLines(t *testing.T) {
 	})
 
 	t.Run("It should read optional parameters", func(t *testing.T) {
-		clientMock := &mocks.Client{}
-		sdk := Sdk{client: clientMock}
+		mockedClient := NewMockClient(gomock.NewController(t))
+		sdk := Sdk{client: mockedClient}
 
-		expected := validKLinesJson()
+		expectedRequest := newRequest(method, url).
+			Param("symbol", "ETHBTC").
+			Param("interval", string(Interval1m)).
+			Param("limit", "10").
+			Param("startTime", "1498793709153").
+			Param("endTime", "1498793709163")
 
-		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v1/klines?symbol=ETHBTC&interval=1m"+
-				"&limit=10&startTime=1498793709153&endTime=1498793709163"
-		})).Return(expected, nil)
+		mockedClient.
+			EXPECT().
+			Do(expectedRequest).
+			MinTimes(1).
+			Return(validKLinesJson(), nil)
 
 		query := NewKLinesQuery("ETHBTC", Interval1m).Limit(10).StartTime(1498793709153).EndTime(1498793709163)
 		response, _ := sdk.KLines(query)
@@ -42,27 +53,37 @@ func TestSdk_KLines(t *testing.T) {
 	})
 
 	t.Run("It should return error when api fails", func(t *testing.T) {
-		clientMock := &mocks.Client{}
-		sdk := Sdk{client: clientMock}
+		mockedClient := NewMockClient(gomock.NewController(t))
+		sdk := Sdk{client: mockedClient}
 
-		expectedError := errors.New("error")
+		expectedRequest := newRequest(method, url).
+			Param("symbol", "ETHBTC").
+			Param("interval", string(Interval1m))
 
-		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v1/klines?symbol=ETHBTC&interval=1m"
-		})).Return(nil, expectedError)
+		mockedClient.
+			EXPECT().
+			Do(expectedRequest).
+			MinTimes(1).
+			Return(nil, errors.New("error"))
 
 		_, err := sdk.KLines(NewKLinesQuery("ETHBTC", Interval1m))
 
-		assert.Equal(t, expectedError, err)
+		assert.Error(t, err)
 	})
 
 	t.Run("It should return error when response cannot be mapped", func(t *testing.T) {
-		clientMock := &mocks.Client{}
-		sdk := Sdk{client: clientMock}
+		mockedClient := NewMockClient(gomock.NewController(t))
+		sdk := Sdk{client: mockedClient}
 
-		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v1/klines?symbol=ETHBTC&interval=1m"
-		})).Return(invalidJson(), nil)
+		expectedRequest := newRequest(method, url).
+			Param("symbol", "ETHBTC").
+			Param("interval", string(Interval1m))
+
+		mockedClient.
+			EXPECT().
+			Do(expectedRequest).
+			MinTimes(1).
+			Return(invalidJson(), nil)
 
 		_, err := sdk.KLines(NewKLinesQuery("ETHBTC", Interval1m))
 
@@ -72,20 +93,20 @@ func TestSdk_KLines(t *testing.T) {
 
 func validKLinesJson() []byte {
 	return []byte(`[
-		[	
-    		1499040000000,      
-    		"0.01634790",       
-    		"0.80000000",       
-    		"0.01575800",       
-    		"0.01577100",       
-    		"148976.11427815",  
-    		1499644799999,      
-    		"2434.19055334",    
-    		308,                
-    		"1756.87402397",    
-    		"28.46694368",      
-    		"17928899.62484339" 
-  		]
+		[
+   		1499040000000,
+   		"0.01634790",
+   		"0.80000000",
+   		"0.01575800",
+   		"0.01577100",
+   		"148976.11427815",
+   		1499644799999,
+   		"2434.19055334",
+   		308,
+   		"1756.87402397",
+   		"28.46694368",
+   		"17928899.62484339"
+ 		]
 	]`)
 }
 

@@ -2,22 +2,27 @@ package binance
 
 import (
 	"errors"
-	"github.com/isd4n/binance-go/mocks"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"testing"
 )
 
 func TestSdk_Trades(t *testing.T) {
+	method, url := "GET", "/api/v1/historicalTrades"
+
 	t.Run("It should convert api response to a Trade slice", func(t *testing.T) {
-		clientMock := &mocks.Client{}
-		sdk := Sdk{client: clientMock}
+		mockedClient := NewMockClient(gomock.NewController(t))
+		sdk := Sdk{client: mockedClient}
 
-		expected := validTradesJson()
+		expectedRequest := newRequest(method, url).
+			Param("symbol", "ETHBTC").
+			Param("limit", "500")
 
-		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v1/historicalTrades?symbol=ETHBTC&limit=500"
-		})).Return(expected, nil)
+		mockedClient.
+			EXPECT().
+			Do(expectedRequest).
+			MinTimes(1).
+			Return(validTradesJson(), nil)
 
 		response, _ := sdk.Trades(NewTradesQuery("ETHBTC"))
 
@@ -25,14 +30,19 @@ func TestSdk_Trades(t *testing.T) {
 	})
 
 	t.Run("It should read optional parameters", func(t *testing.T) {
-		clientMock := &mocks.Client{}
-		sdk := Sdk{client: clientMock}
+		mockedClient := NewMockClient(gomock.NewController(t))
+		sdk := Sdk{client: mockedClient}
 
-		expected := validTradesJson()
+		expectedRequest := newRequest(method, url).
+			Param("symbol", "ETHBTC").
+			Param("limit", "350").
+			Param("fromId", "2300")
 
-		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v1/historicalTrades?symbol=ETHBTC&limit=350&fromId=2300"
-		})).Return(expected, nil)
+		mockedClient.
+			EXPECT().
+			Do(expectedRequest).
+			MinTimes(1).
+			Return(validTradesJson(), nil)
 
 		query := NewTradesQuery("ETHBTC").Limit(350).FromId(2300)
 		response, _ := sdk.Trades(query)
@@ -41,27 +51,36 @@ func TestSdk_Trades(t *testing.T) {
 	})
 
 	t.Run("It should return error when api fails", func(t *testing.T) {
-		clientMock := &mocks.Client{}
-		sdk := Sdk{client: clientMock}
+		mockedClient := NewMockClient(gomock.NewController(t))
+		sdk := Sdk{client: mockedClient}
 
-		expectedError := errors.New("error")
+		expectedRequest := newRequest(method, url).
+			Param("symbol", "ETHBTC").
+			Param("limit", "500")
 
-		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v1/historicalTrades?symbol=ETHBTC&limit=500"
-		})).Return(nil, expectedError)
-
+		mockedClient.
+			EXPECT().
+			Do(expectedRequest).
+			MinTimes(1).
+			Return(validTradesJson(), errors.New("error"))
 		_, err := sdk.Trades(NewTradesQuery("ETHBTC"))
 
-		assert.Equal(t, expectedError, err)
+		assert.Error(t, err)
 	})
 
 	t.Run("It should return error when response cannot be mapped", func(t *testing.T) {
-		clientMock := &mocks.Client{}
-		sdk := Sdk{client: clientMock}
+		mockedClient := NewMockClient(gomock.NewController(t))
+		sdk := Sdk{client: mockedClient}
 
-		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v1/historicalTrades?symbol=ETHBTC&limit=500"
-		})).Return(invalidJson(), nil)
+		expectedRequest := newRequest(method, url).
+			Param("symbol", "ETHBTC").
+			Param("limit", "500")
+
+		mockedClient.
+			EXPECT().
+			Do(expectedRequest).
+			MinTimes(1).
+			Return(invalidJson(), nil)
 
 		_, err := sdk.Trades(NewTradesQuery("ETHBTC"))
 
@@ -71,14 +90,14 @@ func TestSdk_Trades(t *testing.T) {
 
 func validTradesJson() []byte {
 	return []byte(`[
-  		{
-    		"id": 28457,
-    		"price": "4.00000100",
-    		"qty": "12.00000000",
-    		"time": 1499865549590,
-    		"isBuyerMaker": true,
-    		"isBestMatch": true
-  		}
+ 		{
+   		"id": 28457,
+   		"price": "4.00000100",
+   		"qty": "12.00000000",
+   		"time": 1499865549590,
+   		"isBuyerMaker": true,
+   		"isBestMatch": true
+ 		}
 	]`)
 }
 

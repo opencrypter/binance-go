@@ -1,6 +1,8 @@
 package binance
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 type OrderBookTicker struct {
 	Symbol      string  `json:"symbol"`
@@ -19,9 +21,8 @@ func NewSymbolOrderBookTickerQuery(symbol string) *symbolOrderBookTickerQuery {
 }
 
 func (sdk Sdk) SymbolOrderBookTicker(query *symbolOrderBookTickerQuery) (*OrderBookTicker, error) {
-	url := "/api/v3/ticker/bookTicker?symbol=" + query.symbol
-
-	response, err := sdk.client.Get(url)
+	request := newRequest("GET", "/api/v3/ticker/bookTicker").Param("symbol", query.symbol)
+	response, err := sdk.client.Do(request)
 	if err != nil {
 		return nil, err
 	}
@@ -30,9 +31,8 @@ func (sdk Sdk) SymbolOrderBookTicker(query *symbolOrderBookTickerQuery) (*OrderB
 }
 
 func (sdk Sdk) AllSymbolOrderBookTickers() ([]OrderBookTicker, error) {
-	url := "/api/v3/ticker/bookTicker"
-
-	response, err := sdk.client.Get(url)
+	request := newRequest("GET", "/api/v3/ticker/bookTicker")
+	response, err := sdk.client.Do(request)
 	if err != nil {
 		return nil, err
 	}

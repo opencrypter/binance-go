@@ -98,21 +98,23 @@ func parseKLinesResponse(jsonContent []byte) ([]KLine, error) {
 }
 
 func (sdk *Sdk) KLines(query *kLinesQuery) ([]KLine, error) {
-	url := "/api/v1/klines" + "?symbol=" + query.symbol + "&interval=" + string(query.interval)
+	request := newRequest("GET", "/api/v1/klines").
+		Param("symbol", query.symbol).
+		Param("interval", string(query.interval))
 
 	if query.limit > 0 {
-		url += "&limit=" + strconv.Itoa(query.limit)
+		request.Param("limit", strconv.Itoa(query.limit))
 	}
 
 	if query.startTime > 0 {
-		url += "&startTime=" + strconv.Itoa(query.startTime)
+		request.Param("startTime", strconv.Itoa(query.startTime))
 	}
 
 	if query.endTime > 0 {
-		url += "&endTime=" + strconv.Itoa(query.endTime)
+		request.Param("endTime", strconv.Itoa(query.endTime))
 	}
 
-	responseContent, err := sdk.client.Get(url)
+	responseContent, err := sdk.client.Do(request)
 	if err != nil {
 		return nil, err
 	}

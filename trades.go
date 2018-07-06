@@ -47,13 +47,15 @@ func parseTradesResponse(jsonContent []byte) ([]Trade, error) {
 }
 
 func (sdk *Sdk) Trades(query *tradesQuery) ([]Trade, error) {
-	url := "/api/v1/historicalTrades" + "?symbol=" + query.symbol + "&limit=" + strconv.Itoa(query.limit)
+	request := newRequest("GET", "/api/v1/historicalTrades").
+		Param("symbol", query.symbol).
+		Param("limit", strconv.Itoa(query.limit))
 
 	if query.fromId > 0 {
-		url += "&fromId=" + strconv.Itoa(query.fromId)
+		request.Param("fromId", strconv.Itoa(query.fromId))
 	}
 
-	responseContent, err := sdk.client.Get(url)
+	responseContent, err := sdk.client.Do(request)
 	if err != nil {
 		return nil, err
 	}

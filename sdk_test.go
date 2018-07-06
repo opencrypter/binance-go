@@ -31,17 +31,17 @@ func TestClient_Get(t *testing.T) {
 			w.WriteHeader(200)
 		})
 
-		response, _ := sdk.Get("/testing")
+		response, _ := sdk.Do(newRequest("GET", "/testing"))
 		assert.Equal(t, expectedSuccessResponse, response)
 	})
 
 	t.Run("It should return an error on receive an invalid path", func(t *testing.T) {
-		_, err := sdk.Get("error")
+		_, err := sdk.Do(newRequest("GET", "wrong-path"))
 		assert.Error(t, err)
 	})
 
 	t.Run("It should return an error on server error", func(t *testing.T) {
-		_, err := sdk.Get("/missing-path")
+		_, err := sdk.Do(newRequest("GET", "/missing-path"))
 		assert.Error(t, err)
 	})
 }

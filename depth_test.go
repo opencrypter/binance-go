@@ -2,22 +2,27 @@ package binance
 
 import (
 	"errors"
-	"github.com/isd4n/binance-go/mocks"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"testing"
 )
 
 func TestSdk_Depth(t *testing.T) {
+	method, url := "GET", "/api/v1/depth"
+
 	t.Run("It should convert api response to a Depth", func(t *testing.T) {
-		clientMock := &mocks.Client{}
-		sdk := Sdk{client: clientMock}
+		mockedClient := NewMockClient(gomock.NewController(t))
+		sdk := Sdk{client: mockedClient}
 
-		expected := validDepthJson()
+		expectedRequest := newRequest(method, url).
+			Param("symbol", "ETHBTC").
+			Param("limit", "100")
 
-		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v1/depth?symbol=ETHBTC&limit=100"
-		})).Return(expected, nil)
+		mockedClient.
+			EXPECT().
+			Do(expectedRequest).
+			MinTimes(1).
+			Return(validDepthJson(), nil)
 
 		response, _ := sdk.Depth(NewDepthQuery("ETHBTC"))
 
@@ -25,14 +30,18 @@ func TestSdk_Depth(t *testing.T) {
 	})
 
 	t.Run("It should read optional parameters", func(t *testing.T) {
-		clientMock := &mocks.Client{}
-		sdk := Sdk{client: clientMock}
+		mockedClient := NewMockClient(gomock.NewController(t))
+		sdk := Sdk{client: mockedClient}
 
-		expected := validDepthJson()
+		expectedRequest := newRequest(method, url).
+			Param("symbol", "ETHBTC").
+			Param("limit", "500")
 
-		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v1/depth?symbol=ETHBTC&limit=500"
-		})).Return(expected, nil)
+		mockedClient.
+			EXPECT().
+			Do(expectedRequest).
+			MinTimes(1).
+			Return(validDepthJson(), nil)
 
 		query := NewDepthQuery("ETHBTC").Limit(500)
 		response, _ := sdk.Depth(query)
@@ -41,27 +50,37 @@ func TestSdk_Depth(t *testing.T) {
 	})
 
 	t.Run("It should return error when api fails", func(t *testing.T) {
-		clientMock := &mocks.Client{}
-		sdk := Sdk{client: clientMock}
+		mockedClient := NewMockClient(gomock.NewController(t))
+		sdk := Sdk{client: mockedClient}
 
-		expectedError := errors.New("error")
+		expectedRequest := newRequest(method, url).
+			Param("symbol", "ETHBTC").
+			Param("limit", "100")
 
-		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v1/depth?symbol=ETHBTC&limit=100"
-		})).Return(nil, expectedError)
+		mockedClient.
+			EXPECT().
+			Do(expectedRequest).
+			MinTimes(1).
+			Return(nil, errors.New("error"))
 
 		_, err := sdk.Depth(NewDepthQuery("ETHBTC"))
 
-		assert.Equal(t, expectedError, err)
+		assert.Error(t, err)
 	})
 
 	t.Run("It should return error when response cannot be mapped", func(t *testing.T) {
-		clientMock := &mocks.Client{}
-		sdk := Sdk{client: clientMock}
+		mockedClient := NewMockClient(gomock.NewController(t))
+		sdk := Sdk{client: mockedClient}
 
-		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v1/depth?symbol=ETHBTC&limit=100"
-		})).Return(invalidJson(), nil)
+		expectedRequest := newRequest(method, url).
+			Param("symbol", "ETHBTC").
+			Param("limit", "100")
+
+		mockedClient.
+			EXPECT().
+			Do(expectedRequest).
+			MinTimes(1).
+			Return(invalidJson(), nil)
 
 		_, err := sdk.Depth(NewDepthQuery("ETHBTC"))
 
@@ -71,21 +90,21 @@ func TestSdk_Depth(t *testing.T) {
 
 func validDepthJson() []byte {
 	return []byte(`{
-  		"lastUpdateId": 1027024,
-  		"bids": [
-    		[
-      			"4.00000000",     
-      			"431.00000000",   
-      			[]                
-    		]
-  		],
-  		"asks": [
-    		[
-      			"4.00000200",
-      			"12.05000000",
-      			[]
-    		]
-  		]
+ 		"lastUpdateId": 1027024,
+ 		"bids": [
+   		[
+     			"4.00000000",
+     			"431.00000000",
+     			[]
+   		]
+ 		],
+ 		"asks": [
+   		[
+     			"4.00000200",
+     			"12.05000000",
+     			[]
+   		]
+ 		]
 	}`)
 }
 

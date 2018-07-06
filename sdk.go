@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 )
 
 type Sdk struct {
@@ -11,7 +12,7 @@ type Sdk struct {
 }
 
 type Client interface {
-	Get(url string) ([]byte, error)
+	Do(request *request) ([]byte, error)
 }
 
 type client struct {
@@ -20,12 +21,34 @@ type client struct {
 	apiSecret string
 }
 
-func (c *client) Get(path string) ([]byte, error) {
-	request, _ := http.NewRequest("GET", c.baseUrl+path, nil)
-	request.Header.Set("X-MBX-APIKEY", c.apiKey)
+type request struct {
+	method     string
+	path       string
+	parameters url.Values
+	signature  string
+}
+
+func newRequest(method string, path string) *request {
+	return &request{
+		method:     method,
+		path:       path,
+		parameters: url.Values{},
+	}
+}
+
+func (r *request) Param(key string, value string) *request {
+	r.parameters.Set(key, value)
+	return r
+}
+
+func (c *client) Do(request *request) ([]byte, error) {
+	parameters := request.parameters.Encode()
+
+	r, _ := http.NewRequest("GET", c.baseUrl+request.path+parameters, nil)
+	r.Header.Set("X-MBX-APIKEY", c.apiKey)
 
 	client := http.Client{}
-	response, err := client.Do(request)
+	response, err := client.Do(r)
 
 	if err != nil {
 		return nil, err
