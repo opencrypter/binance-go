@@ -2,22 +2,25 @@ package binance
 
 import (
 	"errors"
-	"github.com/isd4n/binance-go/mocks"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"testing"
 )
 
 func TestSdk_SymbolPriceTicker(t *testing.T) {
+	method, url := "GET", "/api/v3/ticker/price"
+
 	t.Run("It should convert api response to a SymbolPrice", func(t *testing.T) {
-		clientMock := &mocks.Client{}
-		sdk := Sdk{client: clientMock}
+		mockedClient := NewMockClient(gomock.NewController(t))
+		sdk := Sdk{client: mockedClient}
 
-		expected := validSymbolPriceTickerJson()
+		expectedRequest := newRequest(method, url).Param("symbol", "LTCBTC")
 
-		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v3/ticker/price?symbol=LTCBTC"
-		})).Return(expected, nil)
+		mockedClient.
+			EXPECT().
+			Do(expectedRequest).
+			MinTimes(1).
+			Return(validSymbolPriceTickerJson(), nil)
 
 		response, _ := sdk.SymbolPriceTicker(NewSymbolPriceTickerQuery("LTCBTC"))
 
@@ -25,27 +28,33 @@ func TestSdk_SymbolPriceTicker(t *testing.T) {
 	})
 
 	t.Run("It should return error when api fails", func(t *testing.T) {
-		clientMock := &mocks.Client{}
-		sdk := Sdk{client: clientMock}
+		mockedClient := NewMockClient(gomock.NewController(t))
+		sdk := Sdk{client: mockedClient}
 
-		expectedError := errors.New("error")
+		expectedRequest := newRequest(method, url).Param("symbol", "LTCBTC")
 
-		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v3/ticker/price?symbol=LTCBTC"
-		})).Return(nil, expectedError)
+		mockedClient.
+			EXPECT().
+			Do(expectedRequest).
+			MinTimes(1).
+			Return(nil, errors.New("error"))
 
 		_, err := sdk.SymbolPriceTicker(NewSymbolPriceTickerQuery("LTCBTC"))
 
-		assert.Equal(t, expectedError, err)
+		assert.Error(t, err)
 	})
 
 	t.Run("It should return error when response cannot be mapped", func(t *testing.T) {
-		clientMock := &mocks.Client{}
-		sdk := Sdk{client: clientMock}
+		mockedClient := NewMockClient(gomock.NewController(t))
+		sdk := Sdk{client: mockedClient}
 
-		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v3/ticker/price?symbol=LTCBTC"
-		})).Return(invalidJson(), nil)
+		expectedRequest := newRequest(method, url).Param("symbol", "LTCBTC")
+
+		mockedClient.
+			EXPECT().
+			Do(expectedRequest).
+			MinTimes(1).
+			Return(invalidJson(), nil)
 
 		_, err := sdk.SymbolPriceTicker(NewSymbolPriceTickerQuery("LTCBTC"))
 
@@ -54,15 +63,19 @@ func TestSdk_SymbolPriceTicker(t *testing.T) {
 }
 
 func TestSdk_AllSymbolPriceTickers(t *testing.T) {
+	method, url := "GET", "/api/v3/ticker/price"
+
 	t.Run("It should convert api response to a SymbolPrice slice", func(t *testing.T) {
-		clientMock := &mocks.Client{}
-		sdk := Sdk{client: clientMock}
+		mockedClient := NewMockClient(gomock.NewController(t))
+		sdk := Sdk{client: mockedClient}
 
-		expected := validSymbolPriceTickerSliceJson()
+		expectedRequest := newRequest(method, url)
 
-		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v3/ticker/price"
-		})).Return(expected, nil)
+		mockedClient.
+			EXPECT().
+			Do(expectedRequest).
+			MinTimes(1).
+			Return(validSymbolPriceTickerSliceJson(), nil)
 
 		response, _ := sdk.AllSymbolPriceTickers()
 
@@ -70,27 +83,33 @@ func TestSdk_AllSymbolPriceTickers(t *testing.T) {
 	})
 
 	t.Run("It should return error when api fails", func(t *testing.T) {
-		clientMock := &mocks.Client{}
-		sdk := Sdk{client: clientMock}
+		mockedClient := NewMockClient(gomock.NewController(t))
+		sdk := Sdk{client: mockedClient}
 
-		expectedError := errors.New("error")
+		expectedRequest := newRequest(method, url)
 
-		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v3/ticker/price"
-		})).Return(nil, expectedError)
+		mockedClient.
+			EXPECT().
+			Do(expectedRequest).
+			MinTimes(1).
+			Return(nil, errors.New("error"))
 
 		_, err := sdk.AllSymbolPriceTickers()
 
-		assert.Equal(t, expectedError, err)
+		assert.Error(t, err)
 	})
 
 	t.Run("It should return error when response cannot be mapped", func(t *testing.T) {
-		clientMock := &mocks.Client{}
-		sdk := Sdk{client: clientMock}
+		mockedClient := NewMockClient(gomock.NewController(t))
+		sdk := Sdk{client: mockedClient}
 
-		clientMock.On("Get", mock.MatchedBy(func(path string) bool {
-			return path == "/api/v3/ticker/price"
-		})).Return(invalidJson(), nil)
+		expectedRequest := newRequest(method, url)
+
+		mockedClient.
+			EXPECT().
+			Do(expectedRequest).
+			MinTimes(1).
+			Return(invalidJson(), nil)
 
 		_, err := sdk.AllSymbolPriceTickers()
 
@@ -100,8 +119,8 @@ func TestSdk_AllSymbolPriceTickers(t *testing.T) {
 
 func validSymbolPriceTickerJson() []byte {
 	return []byte(`{
-  		"symbol": "LTCBTC",
-  		"price": "4.00000200"
+ 		"symbol": "LTCBTC",
+ 		"price": "4.00000200"
 	}`)
 }
 
@@ -114,14 +133,14 @@ func validSymbolPriceTickerResponse() *SymbolPrice {
 
 func validSymbolPriceTickerSliceJson() []byte {
 	return []byte(`[
-  		{
-    		"symbol": "LTCBTC",
-    		"price": "4.00000200"
-  		},
-  		{
-    		"symbol": "ETHBTC",
-    		"price": "0.07946600"
-  		}
+ 		{
+   		"symbol": "LTCBTC",
+   		"price": "4.00000200"
+ 		},
+ 		{
+   		"symbol": "ETHBTC",
+   		"price": "0.07946600"
+ 		}
 	]`)
 }
 

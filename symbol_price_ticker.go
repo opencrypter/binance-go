@@ -1,7 +1,10 @@
 package binance
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
+// Symbol price ticker data transfer object (DTO)
 type SymbolPrice struct {
 	Symbol string
 	Price  float64 `json:"price,string"`
@@ -11,14 +14,15 @@ type symbolPriceTickerQuery struct {
 	symbol string
 }
 
+// Required query for SymbolPriceTicker.
 func NewSymbolPriceTickerQuery(symbol string) *symbolPriceTickerQuery {
 	return &symbolPriceTickerQuery{symbol: symbol}
 }
 
+// Latest price for a symbol.
 func (sdk Sdk) SymbolPriceTicker(query *symbolPriceTickerQuery) (*SymbolPrice, error) {
-	url := "/api/v3/ticker/price?symbol=" + query.symbol
-
-	response, err := sdk.client.Get(url)
+	request := newRequest("GET", "/api/v3/ticker/price").Param("symbol", query.symbol)
+	response, err := sdk.client.Do(request)
 	if err != nil {
 		return nil, err
 	}
@@ -26,10 +30,10 @@ func (sdk Sdk) SymbolPriceTicker(query *symbolPriceTickerQuery) (*SymbolPrice, e
 	return parseSymbolPriceTickerResponse(response)
 }
 
+// Latest price for all symbols.
 func (sdk Sdk) AllSymbolPriceTickers() ([]SymbolPrice, error) {
-	url := "/api/v3/ticker/price"
-
-	response, err := sdk.client.Get(url)
+	request := newRequest("GET", "/api/v3/ticker/price")
+	response, err := sdk.client.Do(request)
 	if err != nil {
 		return nil, err
 	}

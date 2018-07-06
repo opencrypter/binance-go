@@ -50,7 +50,8 @@ func parseExchangeInfo(jsonContent []byte) (*ExchangeInfo, error) {
 }
 
 func (sdk Sdk) ExchangeInfo() (*ExchangeInfo, error) {
-	response, err := sdk.client.Get("/api/v1/exchangeInfo")
+	request := newRequest("GET", "/api/v1/exchangeInfo")
+	response, err := sdk.client.Do(request)
 	if err != nil {
 		return nil, err
 	}
