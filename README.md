@@ -1,6 +1,6 @@
 # Binance-Go
-[![Build Status](https://travis-ci.org/isd4n/binance-go.svg?branch=master)](https://travis-ci.org/isd4n/binance-go)
-[![codecov](https://codecov.io/gh/isd4n/binance-go/branch/master/graph/badge.svg)](https://codecov.io/gh/isd4n/binance-go)
+[![Build Status](https://travis-ci.org/opencrypter/binance-go.svg?branch=master)](https://travis-ci.org/opencrypter/binance-go)
+[![codecov](https://codecov.io/gh/opencrypter/binance-go/branch/master/graph/badge.svg)](https://codecov.io/gh/opencrypter/binance-go)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 An open source sdk for [Binance exchange](https://www.binance.com) written in Golang. There are endpoints/streams that
@@ -9,7 +9,7 @@ are not implemented yet. Feel free to collaborate with me if you need them now :
 ## Installation
 After you've configured your local Go package:
 ```bash
-go get github.com/isd4n/binance-go
+go get github.com/opencrypter/binance-go
 ```
 
 ## Usage
@@ -18,7 +18,7 @@ This SDK is based on the official [binance api docs](https://github.com/binance-
 You only have to call the constructor function in order to use it:
 
 ```go
-import "github.com/isd4n/binance-go"
+import "github.com/opencrypter/binance-go"
 
 sdk := binance.New("Your-api-key", "Your secret api-key")
 
