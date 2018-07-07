@@ -200,6 +200,22 @@ request := binance.NewCancelOrderRequest("LTCBTC").
 response, err := sdk.CancelOrder(request)
 ```
 
+### Current open orders (USER_DATA)
+Get all open orders on a symbol.
+
+Official doc: [Current open orders (USER_DATA)](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#current-open-orders-user_data)
+
+#### Example
+```go
+query := binance.NewGetOpenOrdersQuery("LTCBTC")
+response, err := sdk.GetOpenOrders(query)
+
+// With all optional parameters (See official doc)
+query := binance.NewGetOpenOrdersQuery("LTCBTC").RecvWindow(2)
+response, err := sdk.GetOpenOrders(query)
+```
+
+
 ## Available web socket streams:
 Not available yet.
 
