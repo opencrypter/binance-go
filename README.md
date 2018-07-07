@@ -175,11 +175,29 @@ query := binance.NewGetOrderQuery("LTCBTC")
 response, err := sdk.GetOrder(query)
 
 // With all optional parameters (See official doc)
-query := NewGetOrderQuery("LTCBTC").
+query := binance.NewGetOrderQuery("LTCBTC").
 	OrderId(1).
 	OrigClientOrderId("myOrder1").
 	RecvWindow(2)
 response, err := sdk.GetOrder(query)
+```
+
+### Cancel order (TRADE)
+Cancel an active order.
+
+Official doc: [Cancel order (TRADE)](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#cancel-order-trade)
+
+#### Example
+```go
+request := binance.NewCancelOrderRequest("LTCBTC")
+response, err := sdk.CancelOrder(request)
+
+// With all optional parameters (See official doc)
+request := binance.NewCancelOrderRequest("LTCBTC").
+    OrderId(1).
+    OrigClientOrderId("myOrder1").
+    RecvWindow(2000)
+response, err := sdk.CancelOrder(request)
 ```
 
 ## Available web socket streams:
