@@ -142,6 +142,29 @@ Official doc: [Symbol order book ticker](https://github.com/binance-exchange/bin
 response, err := sdk.AllSymbolOrderBookTickers()
 ```
 
+### New order (TRADE)
+Send a new order.
+
+Official doc: [New order (TRADE)](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#new-order--trade)
+
+#### Example
+```go
+request := binance.NewOrderRequest("BTCUSDT", "SELL", "MARKET", 10)
+response, err := sdk.NewOrder(request)
+
+// With all optional parameters (See official doc)
+request := NewOrderRequest("BTCUSDT", "SELL", "MARKET", 10).
+	TimeInForce("GTC").
+	Price(0.1).
+	NewClientOrderId("6gCrw2kRUAF9CvJDGP16IP").
+	StopPrice(0.1).
+	IcebergQuantity(0.1).
+	NewOrderResponseType("ACK").
+	RecvWindow(2)
+response, err := sdk.NewOrder(request)
+```
+
+
 ## Available web socket streams:
 Not available yet.
 

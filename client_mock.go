@@ -9,6 +9,41 @@ import (
 	reflect "reflect"
 )
 
+// MockClock is a mock of Clock interface
+type MockClock struct {
+	ctrl     *gomock.Controller
+	recorder *MockClockMockRecorder
+}
+
+// MockClockMockRecorder is the mock recorder for MockClock
+type MockClockMockRecorder struct {
+	mock *MockClock
+}
+
+// NewMockClock creates a new mock instance
+func NewMockClock(ctrl *gomock.Controller) *MockClock {
+	mock := &MockClock{ctrl: ctrl}
+	mock.recorder = &MockClockMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockClock) EXPECT() *MockClockMockRecorder {
+	return m.recorder
+}
+
+// Now mocks base method
+func (m *MockClock) Now() *int64 {
+	ret := m.ctrl.Call(m, "Now")
+	ret0, _ := ret[0].(*int64)
+	return ret0
+}
+
+// Now indicates an expected call of Now
+func (mr *MockClockMockRecorder) Now() *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Now", reflect.TypeOf((*MockClock)(nil).Now))
+}
+
 // MockClient is a mock of Client interface
 type MockClient struct {
 	ctrl     *gomock.Controller

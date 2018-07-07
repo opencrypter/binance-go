@@ -1,14 +1,33 @@
 package binance
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strconv"
+	"strings"
+	"time"
 )
 
 type Sdk struct {
 	client Client
+	clock  Clock
+}
+
+type Clock interface {
+	Now() *int64
+}
+
+type clock struct {
+}
+
+func (t clock) Now() *int64 {
+	now := int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)
+	return &now
 }
 
 type Client interface {
@@ -25,7 +44,7 @@ type request struct {
 	method     string
 	path       string
 	parameters url.Values
-	signature  string
+	signed     bool
 }
 
 func newRequest(method string, path string) *request {
@@ -41,10 +60,35 @@ func (r *request) Param(key string, value string) *request {
 	return r
 }
 
-func (c *client) Do(request *request) ([]byte, error) {
-	parameters := request.parameters.Encode()
+func (r *request) StringParam(key string, value *string) *request {
+	if value != nil {
+		r.parameters.Set(key, *value)
+	}
+	return r
+}
 
-	r, _ := http.NewRequest("GET", c.baseUrl+request.path+parameters, nil)
+func (r *request) Float64Param(key string, value *float64) *request {
+	if value != nil {
+		r.parameters.Set(key, strconv.FormatFloat(*value, 'f', 8, 64))
+	}
+	return r
+}
+
+func (r *request) Int64Param(key string, value *int64) *request {
+	if value != nil {
+		r.parameters.Set(key, strconv.FormatInt(*value, 10))
+	}
+	return r
+}
+
+func (r *request) Sign() *request {
+	r.signed = true
+	return r
+}
+
+func (c *client) Do(request *request) ([]byte, error) {
+	r, _ := c.createRequest(request)
+
 	r.Header.Set("X-MBX-APIKEY", c.apiKey)
 
 	client := http.Client{}
@@ -58,8 +102,34 @@ func (c *client) Do(request *request) ([]byte, error) {
 	if response.StatusCode >= 300 {
 		return nil, errors.New("Error " + string(response.StatusCode) + ": " + string(responseBody))
 	}
-
 	return responseBody, nil
+}
+
+func (c *client) createRequest(request *request) (*http.Request, error) {
+	if request.signed {
+		request.Param("signature", c.sign(request))
+	}
+	if request.method == "GET" {
+		return c.get(request)
+	}
+	return c.post(request)
+}
+
+func (c *client) sign(request *request) string {
+	signature := hmac.New(sha256.New, []byte(c.apiSecret))
+	signature.Write([]byte(request.parameters.Encode()))
+
+	return hex.EncodeToString(signature.Sum(nil))
+}
+
+func (c *client) get(request *request) (*http.Request, error) {
+	parameters := request.parameters.Encode()
+	return http.NewRequest(request.method, c.baseUrl+request.path+parameters, nil)
+}
+
+func (c *client) post(request *request) (*http.Request, error) {
+	form := request.parameters.Encode()
+	return http.NewRequest(request.method, c.baseUrl+request.path, strings.NewReader(form))
 }
 
 func New(apiKey string, apiSecret string) Sdk {
@@ -69,5 +139,6 @@ func New(apiKey string, apiSecret string) Sdk {
 			apiKey:    apiKey,
 			apiSecret: apiSecret,
 		},
+		clock: clock{},
 	}
 }
