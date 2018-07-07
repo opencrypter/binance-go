@@ -16,7 +16,7 @@ type FullOrder struct {
 	TimeInForce      string      `json:"timeInForce"`
 	Type             string      `json:"type"`
 	Side             string      `json:"side"`
-	Fills []OrderFill `json:"fills"`
+	Fills            []OrderFill `json:"fills"`
 }
 
 type OrderFill struct {
@@ -109,10 +109,10 @@ func (sdk Sdk) NewOrder(request *newOrderRequest) (*FullOrder, error) {
 		return nil, err
 	}
 
-	return parseOrderResponse(responseContent)
+	return parseNewOrderResponse(responseContent)
 }
 
-func parseOrderResponse(jsonContent []byte) (*FullOrder, error) {
+func parseNewOrderResponse(jsonContent []byte) (*FullOrder, error) {
 	response := &FullOrder{}
 	err := json.Unmarshal(jsonContent, &response)
 	return response, err

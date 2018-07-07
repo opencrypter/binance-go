@@ -9,8 +9,8 @@ import (
 	"time"
 )
 
-func TestSdk_GetOrder(t *testing.T) {
-	method, url := "GET", "/api/v3/order"
+func TestSdk_GetOpenOrders(t *testing.T) {
+	method, url := "GET", "/api/v3/openOrders"
 
 	t.Run("It should convert api response to an open order", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
@@ -30,12 +30,12 @@ func TestSdk_GetOrder(t *testing.T) {
 			EXPECT().
 			Do(expectedRequest).
 			MinTimes(1).
-			Return(validOrderJson(), nil)
+			Return(validOpenOrdersJson(), nil)
 
-		query := NewGetOrderQuery("LTCBTC")
-		response, _ := sdk.GetOrder(query)
+		query := NewGetOpenOrdersQuery("LTCBTC")
+		response, _ := sdk.GetOpenOrders(query)
 
-		assert.Equal(t, validOrderResponse(), response)
+		assert.Equal(t, validOpenOrdersResponse(), response)
 	})
 
 	t.Run("It should read optional parameters", func(t *testing.T) {
@@ -49,8 +49,6 @@ func TestSdk_GetOrder(t *testing.T) {
 
 		expectedRequest := newRequest(method, url).
 			Param("symbol", "LTCBTC").
-			Param("orderId", "1").
-			Param("origClientOrderId", "myOrder1").
 			Param("recvWindow", "2").
 			Param("timestamp", strconv.FormatInt(expectedTimestamp, 10)).
 			Sign()
@@ -59,16 +57,12 @@ func TestSdk_GetOrder(t *testing.T) {
 			EXPECT().
 			Do(expectedRequest).
 			MinTimes(1).
-			Return(validOrderJson(), nil)
+			Return(validOpenOrdersJson(), nil)
 
-		query := NewGetOrderQuery("LTCBTC").
-			OrderId(1).
-			OrigClientOrderId("myOrder1").
-			RecvWindow(2)
+		query := NewGetOpenOrdersQuery("LTCBTC").RecvWindow(2)
+		response, _ := sdk.GetOpenOrders(query)
 
-		response, _ := sdk.GetOrder(query)
-
-		assert.Equal(t, validOrderResponse(), response)
+		assert.Equal(t, validOpenOrdersResponse(), response)
 	})
 
 	t.Run("It should return error when api fails", func(t *testing.T) {
@@ -91,8 +85,8 @@ func TestSdk_GetOrder(t *testing.T) {
 			MinTimes(1).
 			Return(nil, errors.New("error"))
 
-		query := NewGetOrderQuery("LTCBTC")
-		_, err := sdk.GetOrder(query)
+		query := NewGetOpenOrdersQuery("LTCBTC")
+		_, err := sdk.GetOpenOrders(query)
 
 		assert.Error(t, err)
 	})
@@ -117,15 +111,15 @@ func TestSdk_GetOrder(t *testing.T) {
 			MinTimes(1).
 			Return(invalidJson(), nil)
 
-		query := NewGetOrderQuery("LTCBTC")
-		_, err := sdk.GetOrder(query)
+		query := NewGetOpenOrdersQuery("LTCBTC")
+		_, err := sdk.GetOpenOrders(query)
 
 		assert.Error(t, err)
 	})
 }
 
-func validOrderJson() []byte {
-	return []byte(`{
+func validOpenOrdersJson() []byte {
+	return []byte(`[{
   		"symbol": "LTCBTC",
   		"orderId": 1,
   		"clientOrderId": "myOrder1",
@@ -140,11 +134,11 @@ func validOrderJson() []byte {
   		"icebergQty": "0.0",
   		"time": 1499827319559,
   		"isWorking": true
-	}`)
+	}]`)
 }
 
-func validOrderResponse() *Order {
-	return &Order{
+func validOpenOrdersResponse() []Order {
+	return []Order{{
 		Symbol:           "LTCBTC",
 		OrderId:          1,
 		ClientOrderId:    "myOrder1",
@@ -159,5 +153,5 @@ func validOrderResponse() *Order {
 		IcebergQuantity:  0.0,
 		Time:             1499827319559,
 		IsWorking:        true,
-	}
+	}}
 }

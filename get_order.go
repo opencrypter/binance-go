@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 )
 
-type OpenOrder struct {
+type Order struct {
 	Symbol           string  `json:"symbol"`
 	OrderId          int64   `json:"orderId"`
 	ClientOrderId    string  `json:"clientOrderId"`
@@ -50,7 +50,7 @@ func (r *getOrderQuery) RecvWindow(value int64) *getOrderQuery {
 	return r
 }
 
-func (sdk Sdk) GetOrder(query *getOrderQuery) (*OpenOrder, error) {
+func (sdk Sdk) GetOrder(query *getOrderQuery) (*Order, error) {
 	req := newRequest("GET", "/api/v3/order").
 		StringParam("symbol", query.symbol).
 		Int64Param("orderId", query.orderId).
@@ -64,11 +64,11 @@ func (sdk Sdk) GetOrder(query *getOrderQuery) (*OpenOrder, error) {
 		return nil, err
 	}
 
-	return parseOpenOrderResponse(responseContent)
+	return parseOrderResponse(responseContent)
 }
 
-func parseOpenOrderResponse(jsonContent []byte) (*OpenOrder, error) {
-	response := &OpenOrder{}
+func parseOrderResponse(jsonContent []byte) (*Order, error) {
+	response := &Order{}
 	err := json.Unmarshal(jsonContent, &response)
 	return response, err
 }
