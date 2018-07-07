@@ -233,6 +233,22 @@ query := binance.NewGetAllOrdersQuery("LTCBTC").
 response, _ := sdk.GetAllOrders(query)
 ```
 
+### Account information (USER_DATA)
+Get current account information.
+
+Official doc: [Account information (USER_DATA)](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#account-information-user_data)
+
+#### Example
+```go
+query := binance.NewAccountQuery()
+response, _ := sdk.Account(query)
+
+// With all optional parameters (See official doc)
+query := binance.NewAccountQuery().RecvWindow(2000)
+response, _ := sdk.Account(query)
+```
+
+
 ## Available web socket streams:
 Not available yet.
 
