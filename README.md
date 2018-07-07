@@ -215,6 +215,23 @@ query := binance.NewGetOpenOrdersQuery("LTCBTC").RecvWindow(2)
 response, err := sdk.GetOpenOrders(query)
 ```
 
+### All orders (USER_DATA)
+Get all account orders; active, canceled, or filled.
+
+Official doc: [All orders (USER_DATA)](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#all-orders-user_data)
+
+#### Example
+```go
+query := binance.NewGetAllOrdersQuery("LTCBTC")
+response, _ := sdk.GetAllOrders(query)
+
+// With all optional parameters (See official doc)
+query := binance.NewGetAllOrdersQuery("LTCBTC").
+    OrderId(1).
+    Limit(200).
+    RecvWindow(2000)
+response, _ := sdk.GetAllOrders(query)
+```
 
 ## Available web socket streams:
 Not available yet.
