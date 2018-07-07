@@ -14,7 +14,7 @@ func runLocalServer() (server *httptest.Server, mux *http.ServeMux) {
 	return srv, mux
 }
 
-func TestClient_Get(t *testing.T) {
+func TestClient_Do(t *testing.T) {
 	server, mux := runLocalServer()
 	defer server.Close()
 
@@ -44,11 +44,28 @@ func TestClient_Get(t *testing.T) {
 		_, err := sdk.Do(newRequest("GET", "/missing-path"))
 		assert.Error(t, err)
 	})
+
+	t.Run("It should be signed", func(t *testing.T) {
+		expectedSuccessResponse := []byte(`{"json":true}`)
+		mux.HandleFunc("/testing-post", func(w http.ResponseWriter, r *http.Request) {
+			w.Write(expectedSuccessResponse)
+			w.WriteHeader(200)
+		})
+
+		request := newRequest("POST", "/testing-post").Sign()
+		response, _ := sdk.Do(request)
+		assert.Equal(t, expectedSuccessResponse, response)
+	})
 }
 
 func TestNew(t *testing.T) {
 	sdk := New("api-key", "api-secret")
 	assert.Implements(t, (*Client)(nil), sdk.client)
+}
+
+func TestClock_Now(t *testing.T) {
+	clock := clock{}
+	assert.NotZero(t, clock.Now())
 }
 
 func invalidJson() []byte {
