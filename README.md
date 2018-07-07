@@ -164,6 +164,23 @@ request := NewOrderRequest("BTCUSDT", "SELL", "MARKET", 10).
 response, err := sdk.NewOrder(request)
 ```
 
+### Query order (USER_DATA)
+Get order detail.
+
+Official doc: [Query order (USER_DATA)](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#query-order-user_data)
+
+#### Example
+```go
+query := binance.NewGetOrderQuery("LTCBTC")
+response, err := sdk.GetOrder(query)
+
+// With all optional parameters (See official doc)
+query := NewGetOrderQuery("LTCBTC").
+	OrderId(1).
+	OrigClientOrderId("myOrder1").
+	RecvWindow(2)
+response, err := sdk.GetOrder(query)
+```
 
 ## Available web socket streams:
 Not available yet.
