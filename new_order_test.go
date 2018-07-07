@@ -12,7 +12,7 @@ import (
 func TestSdk_NewOrder(t *testing.T) {
 	method, url := "POST", "/api/v3/order"
 
-	t.Run("It should convert api response to an FullOrder ACK by default", func(t *testing.T) {
+	t.Run("It should convert api response to a FullOrder", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		mockedClock := NewMockClock(ctrl)
 		mockedClient := NewMockClient(ctrl)
