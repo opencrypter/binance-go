@@ -248,6 +248,20 @@ query := binance.NewAccountQuery().RecvWindow(2000)
 response, _ := sdk.Account(query)
 ```
 
+### Account trade list (USER_DATA)
+Get trades for a specific account and symbol.
+
+Official doc: [Account trade list (USER_DATA)](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#account-trade-list-user_data)
+
+#### Example
+```go
+query := binance.NewMyTradesQuery("ETHBTC")
+response, _ := sdk.MyTrades(query)
+
+// With all optional parameters (See official doc)
+query := binance.NewMyTradesQuery("ETHBTC").Limit(10).RecvWindow(2).FromId(200)
+response, _ := sdk.MyTrades(query)
+```
 
 ## Available web socket streams:
 Not available yet.
