@@ -1,7 +1,7 @@
 # Binance-Go
 [![Build Status](https://travis-ci.org/opencrypter/binance-go.svg?branch=master)](https://travis-ci.org/opencrypter/binance-go)
 [![codecov](https://codecov.io/gh/opencrypter/binance-go/branch/master/graph/badge.svg)](https://codecov.io/gh/opencrypter/binance-go)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Join the chat at https://gitter.im/opencrypter/binance-go](https://badges.gitter.im/opencrypter/binance-go.svg)](https://gitter.im/opencrypter/binance-go?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 An open source sdk for [Binance exchange](https://www.binance.com) written in Golang. There are endpoints/streams that
 are not implemented yet. Feel free to collaborate with me if you need them now :)
