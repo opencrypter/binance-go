@@ -124,7 +124,7 @@ func (c *client) sign(request *request) string {
 
 func (c *client) get(request *request) (*http.Request, error) {
 	parameters := request.parameters.Encode()
-	return http.NewRequest(request.method, c.baseUrl+request.path+parameters, nil)
+	return http.NewRequest(request.method, c.baseUrl+request.path + "?" + parameters, nil)
 }
 
 func (c *client) post(request *request) (*http.Request, error) {
