@@ -88,7 +88,7 @@ func (r *request) Sign() *request {
 
 func (c *client) Do(request *request) ([]byte, error) {
 	r, _ := c.createRequest(request)
-
+	c.addSignature(request, r)
 	r.Header.Set("X-MBX-APIKEY", c.apiKey)
 
 	client := http.Client{}
@@ -106,9 +106,6 @@ func (c *client) Do(request *request) ([]byte, error) {
 }
 
 func (c *client) createRequest(request *request) (*http.Request, error) {
-	if request.signed {
-		request.Param("signature", c.sign(request))
-	}
 	if request.method == "GET" {
 		return c.get(request)
 	}
@@ -120,6 +117,13 @@ func (c *client) sign(request *request) string {
 	signature.Write([]byte(request.parameters.Encode()))
 
 	return hex.EncodeToString(signature.Sum(nil))
+}
+
+func (c *client) addSignature(request *request, httpRequest *http.Request) {
+	if request.signed {
+		query := httpRequest.URL.Query()
+		httpRequest.URL.RawQuery = query.Encode() + "&signature=" + c.sign(request)
+	}
 }
 
 func (c *client) get(request *request) (*http.Request, error) {

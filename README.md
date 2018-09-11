@@ -6,6 +6,8 @@
 An open source sdk for [Binance exchange](https://www.binance.com) written in Golang. There are endpoints/streams that
 are not implemented yet. Feel free to collaborate with me if you need them now :)
 
+**THIS LIBRARY IS NOT READY FOR PRODUCTION YET**
+
 ## Installation
 After you've configured your local Go package:
 ```bash
